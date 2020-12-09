@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+    </head>
+    <body>
+    <script>
+
+        var h= 200;
+        var w= 500;
+        var ds;
+//         var ds=[
+//   {month:1,  sales:  20},
+//   {month:2,  sales:  10},
+//   {month:3,  sales:  50},
+//   {month:4,  sales:  40},
+//   {month:5,  sales:  100},
+//   {month:6,  sales:  20},
+//   {month:7,  sales:  80},
+//   {month:8,  sales:  5},
+//   {month:9,  sales:  70},
+//   {month:10, sales:  30},
+// ];
+        var totalSales= 0;
+        var avgSales= 0.0;
+        var metrics= [];
+
+        function buildLine(){
+
+            var lineFunc= d3.line()
+                    .x(function (d){ return (d.month-20130001)/3.75 })
+                    .y(function (d){ return h-d.sales })
+                    .curve(d3.curveLinear)
+            
+            var svg= d3.select('body').append('svg').attrs({
+                height: h,
+                width: w
+            })
+
+            svg.append('path').attrs({
+                d: lineFunc(ds),
+                'stroke': 'purple',
+                'stroke-width': '2px',
+                'fill': 'none'
+            })
+        }
+
+        function showTotal(){
+
+            var table= d3.select('body').append('table')
+
+            for(let i=0; i<ds.length; i++){
+                totalSales+= parseInt(ds[i].sales)
+            }
+
+            avgSales= (totalSales/ds.length).toFixed(2)
+
+            metrics.push('Total Sales:' + totalSales)
+            metrics.push('Avg Sales:' + avgSales)
+
+            table.selectAll('tr')
+                .data(metrics)
+                .enter()
+                .append('tr')
+                .append('td')
+                .text(function (d){ return d })
+        }
+
+        d3.csv('MonthlySales.csv').then(function(data){
+            console.log(data)
+            ds= data
+            buildLine()
+            showTotal()
+        })
+               
+    </script>
+    </body>
+</html>

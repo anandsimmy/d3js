@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+    </head>
+    <body>
+    <script>
+        var h= 100;
+        var w= 500;
+//         var ds=[
+//   {month:1,  sales:  20},
+//   {month:2,  sales:  10},
+//   {month:3,  sales:  50},
+//   {month:4,  sales:  40},
+//   {month:5,  sales:  100},
+//   {month:6,  sales:  20},
+//   {month:7,  sales:  80},
+//   {month:8,  sales:  5},
+//   {month:9,  sales:  70},
+//   {month:10, sales:  30},
+// ];
+        // var totalSales= 0;
+        // var avgSales= 0.0;
+        // var metrics= [];
+
+        function showHeader(ds){
+            d3.select('body')
+                .append('h1')
+                .text(function(d){
+                    return `${ds.category} Sales`
+                })
+        }
+
+        function buildLine(ds){
+
+            var lineFunc= d3.line()
+                    .x(function (d){ return (d.month-20130001)/3.75 })
+                    .y(function (d){ return h-d.sales })
+                    .curve(d3.curveLinear)
+            
+            var svg= d3.select('body').append('svg').attrs({
+                height: h,
+                width: w
+            })
+
+            svg.append('path').attrs({
+                d: lineFunc(ds.monthlySales),
+                'stroke': 'purple',
+                'stroke-width': '2px',
+                'fill': 'none'
+            })
+        }
+
+        d3.json('MonthlySalesbyCategoryMultiple.json').then(function(data){
+            console.log(data)
+            data.contents.forEach(function(d){
+                showHeader(d)
+                buildLine(d)
+            })
+        })
+               
+    </script>
+    </body>
+</html>

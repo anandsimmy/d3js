@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+    </head>
+    <body>
+        <script>
+            var h= 300
+var w= 400
+
+var dataset= [
+  {month:1,  sales:  20},
+  {month:2,  sales:  10},
+  {month:3,  sales:  50},
+  {month:4,  sales:  40},
+  {month:5,  sales:  100},
+  {month:6,  sales:  20},
+  {month:7,  sales:  80},
+  {month:8,  sales:  5},
+  {month:9,  sales:  70},
+  {month:10, sales:  30},
+]
+
+var lineFunction= d3.line()
+    .x(function(d){return d.month*38;})
+    .y(function(d){return h-d.sales*2;})
+    .curve(d3.curveLinear);
+
+var svg= d3.select('body').append('svg').attrs({
+  width: w,
+  height: h
+})
+
+svg.append('path').attrs({
+  d: lineFunction(dataset),
+  'stroke': 'purple',
+  'stroke-width': 2,
+  'fill': 'none'
+})
+
+svg.selectAll('text')
+  .data(dataset)
+  .enter()
+  .append('text')
+  .text(function(d){return d.sales})
+  .attrs({
+  x: function(d){return d.month*36-5;},
+  y: function(d){return h-d.sales*2-5;},
+  'font-family': 'monospace',
+  'font-size': '15px',
+  'text-anchor': 'start',
+  'font-weight': function(d,i){
+    if(i===0 || i===dataset.length-1){
+      return 'bold'
+    }
+    else
+      return 'normal'
+  }
+  })
+               
+        </script>
+    </body>
+</html>
