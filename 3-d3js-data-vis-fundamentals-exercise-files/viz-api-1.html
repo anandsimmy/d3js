@@ -8,32 +8,14 @@
     <script>
         var h= 200;
         var w= 800;
-//         var ds=[
-//   {month:1,  sales:  20},
-//   {month:2,  sales:  10},
-//   {month:3,  sales:  50},
-//   {month:4,  sales:  40},
-//   {month:5,  sales:  100},
-//   {month:6,  sales:  20},
-//   {month:7,  sales:  80},
-//   {month:8,  sales:  5},
-//   {month:9,  sales:  70},
-//   {month:10, sales:  30},
-// ];
-        // var totalSales= 0;
-        // var avgSales= 0.0;
-        // var metrics= [];
-
         function showHeader(ds){
             d3.select('body')
                 .append('h1')
-                .text(function(d){
+                .text(function(){
                     return `${ds.category} Sales`
                 })
         }
-
         function buildLine(ds){
-
             var lineFunc= d3.line()
                     .x(function (d){ return (d.month-20130001)/1.75 })
                     .y(function (d){ return h-d.sales*2 })
