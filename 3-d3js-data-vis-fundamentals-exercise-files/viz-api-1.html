@@ -7,7 +7,7 @@
     <body>
     <script>
         var h= 200;
-        var w= 800;
+        var w= 500;
         function showHeader(ds){
             d3.select('body')
                 .append('h1')
@@ -16,9 +16,23 @@
                 })
         }
         function buildLine(ds){
+
+            var xScale= d3.scaleLinear()
+                        .domain([
+                            d3.min(ds.monthlySales, function(d){return d.month}),
+                            d3.max(ds.monthlySales, function(d){return d.month})
+                        ])
+                        .range([0,w])
+            var yScale= d3.scaleLinear()
+                        .domain([
+                            0,
+                            d3.max(ds.monthlySales, function(d){return d.sales})
+                        ])
+                        .range([h,0])
+
             var lineFunc= d3.line()
-                    .x(function (d){ return (d.month-20130001)/1.75 })
-                    .y(function (d){ return h-d.sales*2 })
+                    .x(function (d){ return xScale(d.month) })
+                    .y(function (d){ return yScale(d.sales) })
                     .curve(d3.curveLinear)
             
             var svg= d3.select('body').append('svg').attrs({
