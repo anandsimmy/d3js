@@ -38,12 +38,28 @@
         }
         function buildLine(ds){
 
-            var xScale= d3.scaleLinear()
+            function getDate(d){
+
+                var strDate= new String(d)
+
+                var year= strDate.substr(0,4)
+                var month= strDate.substr(4,2)-1
+                var day= strDate.substr(6,2)
+
+                return new Date(year, month, day)
+            }
+
+            var minDate= getDate(ds.monthlySales[0].month)
+            var maxDate= getDate(ds.monthlySales[ds.monthlySales.length-1].month)
+
+            console.log(minDate.maxDate)
+
+            var xScale= d3.scaleTime()
                         .domain([
-                            d3.min(ds.monthlySales, function(d){return d.month}),
-                            d3.max(ds.monthlySales, function(d){return d.month})
+                            minDate,
+                            maxDate
                         ])
-                        .range([padding,w-padding])
+                        .range([padding, w-padding])
             var yScale= d3.scaleLinear()
                         .domain([
                             0,
@@ -51,10 +67,11 @@
                         ])
                         .range([h-padding, 10])
 
-            var yAxis= d3.axisLeft().scale(yScale).ticks(5)
+            var xAxisGen= d3.axisBottom().scale(xScale).tickFormat(d3.timeFormat('%b'))        
+            var yAxisGen= d3.axisLeft().scale(yScale).ticks(5)
 
             var lineFunc= d3.line()
-                    .x(function (d){ return xScale(d.month) })
+                    .x(function (d){ return xScale(getDate(d.month)) })
                     .y(function (d){ return yScale(d.sales) })
                     .curve(d3.curveLinear)
             
@@ -63,7 +80,11 @@
                 width: w
             })
 
-            svg.append('g').call(yAxis)
+            svg.append('g').call(xAxisGen)
+                .attr('class', 'axis')
+                .attr('transform', 'translate(0,'+(h-padding)+')')
+
+            svg.append('g').call(yAxisGen)
                 .attr('class', 'axis')
                 .attr('transform', 'translate('+padding+',0)')
 
