@@ -26,6 +26,14 @@
         </style>
     </head>
     <body>
+        <p>
+            Filter by Time
+            <select id='filter-time'>
+                <option value=12>Last Year</option>
+                <option value=6>Last 6 months</option>
+                <option value=3>Last Quarter</option>
+            </select>
+        </p>
     <script>
         var h=100;
         var w=350;
@@ -47,14 +55,8 @@
         //build line
         function buildLine(ds) {
 
-            // console.log('xscale-max: '+ d3.max(ds.monthlySales, function (d){ return d.month; }));
-            // console.log('yscale-max: '+ d3.max(ds.monthlySales, function (d){ return d.sales; }));
-
             var minDate = getDate(ds.monthlySales[0]['month']);
             var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
-            
-            console.log("min: " +minDate);
-            console.log("max: " +maxDate);
 
             //scales
             var xScale = d3.time.scale()
@@ -97,14 +99,8 @@
 
         function updateLine(ds) {
 
-        // console.log('xscale-max: '+ d3.max(ds.monthlySales, function (d){ return d.month; }));
-        // console.log('yscale-max: '+ d3.max(ds.monthlySales, function (d){ return d.sales; }));
-
         var minDate = getDate(ds.monthlySales[0]['month']);
         var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
-
-        console.log("min: " +minDate);
-        console.log("max: " +maxDate);
 
         //scales
         var xScale = d3.time.scale()
@@ -116,7 +112,9 @@
                     .domain([0, d3.max(ds.monthlySales, function(d){ return d.sales;})])
                     .range([h-padding,10]);
 
-        var xAxisGen = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.time.format("%b"));
+        var xAxisGen = d3.svg.axis().scale(xScale).orient("bottom")
+                        .tickFormat(d3.time.format("%b"))
+                        .ticks(ds.monthlySales.length-1);
         var yAxisGen = d3.svg.axis().scale(yScale).orient("left").ticks(4);
 
         var lineFun = d3.svg.line()
@@ -124,24 +122,17 @@
             .y(function (d) {return yScale(d.sales); })
             .interpolate("linear");
             
-        var svg = d3.select("body").select("svg").attr({ width:w, height:h});
+        var svg = d3.select("body").select("#svg-"+ds.category)
 
-        var yAxis = svg.append("g").call(yAxisGen)
-                    .attr("class", "axis")
-                    .attr("transform", "translate(" + padding + ", 0)");
-                    
-        var xAxis = svg.append("g").call(xAxisGen)
-                    .attr("class","axis")
-                    .attr("transform", "translate(0," + (h-padding) + ")");
+        var xAxis = svg.selectAll("g.x-axis").call(xAxisGen)
+        
+        var yAxis = svg.selectAll("g.y-axis").call(yAxisGen)
 
-        var viz = svg.append("path")
+        console.log('update', ds)
+        var viz = svg.selectAll("#path-"+ds.category)
                     .attr({
-                        d: lineFun(ds.monthlySales),
-                        "stroke" : "purple",
-                        "stroke-width": 2,
-                        "fill" : "none"
+                        d: lineFun(ds.monthlySales)
                     });
-
         }
           
         //show header
@@ -156,21 +147,28 @@
            
            if(error) {
                console.log(error);
-           } else {
-               console.log(data); //we're golden!
            }
     
             var decodedData = JSON.parse(window.atob(data.content));
     
-            console.log(decodedData.contents);
-    
             
             decodedData.contents.forEach(function(content){
                 ds=content;
-                console.log(ds);
                 showHeader(ds);
                 buildLine(ds);                    
             })
+
+            d3.select('#filter-time')
+                .on('change', function (d){
+                    var decodedData = JSON.parse(window.atob(data.content));
+
+                    var sel= d3.select('#filter-time').node().value;
+
+                    decodedData.contents.forEach(function(ds){
+                        ds.monthlySales.splice(0, ds.monthlySales.length-sel);
+                        updateLine(ds);                    
+                    })
+                })
             
         });  
           
