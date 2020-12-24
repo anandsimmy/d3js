@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src='d3.v3.js'></script>
+</head>
+<body>
+    <script>
+        var w=600;
+        var h=300;
+
+        
+        var path= d3.geo.path().projection(projection)
+        var svg= d3.select('body').append('svg')
+                    .attr({
+                        height: h,
+                        width: w
+                    })
+
+        d3.json('us.json', function(data){
+            svg.selectAll('path')
+                .data(data.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .attr('fill', 'black')
+        })
+    </script>
+</body>
+</html>
