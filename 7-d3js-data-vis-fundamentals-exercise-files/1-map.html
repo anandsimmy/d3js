@@ -21,14 +21,45 @@
                         width: w
                     })
 
-        d3.json('us.json', function(data){
+        var color= d3.scale.linear()
+                    .range(['#fff7f3','#fde0dd','#fcc5c0','#fa9fb5','#f768a1','#dd3497','#ae017e','#7a0177'])
+
+        d3.csv('state-sales.csv', function(csv){
+
+            color.domain([0, d3.max(csv, function(d){ return  d.sales })])
+
+            d3.json('us.json', function(json){
+
+            for(let i=0; i<csv.length; i++){
+                stateVal= csv[i].state
+                salesVal= parseFloat(csv[i].sales)
+                for(let j=0; j<json.features.length; j++){
+                    const usState= json.features[j].properties.NAME
+                    if(stateVal===usState){
+                        json.features[j].properties.sales= salesVal
+                        break;
+                    }
+                }
+            }
+
+
             svg.selectAll('path')
-                .data(data.features)
+                .data(json.features)
                 .enter()
                 .append('path')
                 .attr('d', path)
-                .attr('fill', 'black')
+                .style('fill', function(d){
+                    let sales= d.properties.sales
+                    if(sales){
+                        return color(sales)
+                    }else{
+                        return '#faefee'
+                    }
+                })
         })
+
+        })
+
     </script>
 </body>
 </html>
