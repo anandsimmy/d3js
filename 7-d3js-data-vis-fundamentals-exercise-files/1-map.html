@@ -8,12 +8,12 @@
 </head>
 <body>
     <script>
-        var w=600;
-        var h=300;
+        var w=1200;
+        var h=700;
 
         var projection= d3.geo.albersUsa()
                             .translate([w/2, h/2])
-                            .scale([600])
+                            .scale([1200])
         var path= d3.geo.path().projection(projection)
         var svg= d3.select('body').append('svg')
                     .attr({
@@ -56,6 +56,21 @@
                         return '#faefee'
                     }
                 })
+
+            
+            d3.csv('sales-by-city.csv', function(circleData){
+                svg.selectAll('circle')
+                    .data(circleData)
+                    .enter()
+                    .append('circle')
+                    .attr({
+                        cx: function(d) {return projection([d.lon, d.lat])[0]},
+                        cy: function(d) {return projection([d.lon, d.lat])[1]},
+                        r:  function(d) {return Math.sqrt(parseInt(d.sales)*0.0005)},
+                        fill: 'green'
+                    })
+            })
+
         })
 
         })
